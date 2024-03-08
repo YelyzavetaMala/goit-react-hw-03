@@ -1,25 +1,42 @@
+import { Formik, Form, Field, ErrorMessage } from 'formik';
+import * as Yup from 'yup';
 
 export default function ContactForm({ onAdd }) {
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    const name = e.target.elements.name.value;
-    const number = e.target.elements.number.value;
-    onAdd({ id: Date.now(), name, number });
-    e.target.reset();
+  const initialValues = {
+    name: '',
+    number: '',
+  };
+
+  const validationSchema = Yup.object().shape({
+    name: Yup.string().required('Name is required'),
+    number: Yup.string().required('Number is required'),
+  });
+
+  const onSubmit = (values, { resetForm }) => {
+    onAdd({ id: Date.now(), ...values });
+    resetForm();
   };
 
   return (
     <div>
-      <form onSubmit={handleSubmit}>
-        <p>Name</p>      
-        <input type="text" name="name" placeholder="" />
-              
-        <p>Number</p>  
-        <input type="tel" name="number" placeholder="" />
-              
-        <button type="submit">Add contact</button>
-      </form>
+      <Formik
+        initialValues={initialValues}
+        validationSchema={validationSchema}
+        onSubmit={onSubmit}
+      >
+        <Form>
+          <p>Name</p>      
+          <Field type="text" name="name" placeholder="" />
+          <ErrorMessage name="name" component="div" className="error" />
+          
+          <p>Number</p>  
+          <Field type="tel" name="number" placeholder="" />
+          <ErrorMessage name="number" component="div" className="error" />
+          
+          <button type="submit">Add contact</button>
+        </Form>
+      </Formik>
     </div>
-  )
+  );
 }
 
